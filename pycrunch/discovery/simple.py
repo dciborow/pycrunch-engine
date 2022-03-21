@@ -15,7 +15,7 @@ class DiscoveredTest:
         self.module = module
         # name of the test
         self.name = name
-        self.fqn = module + ':' + name
+        self.fqn = f'{module}:{name}'
 
 class TestSet:
     def __init__(self):
@@ -48,16 +48,12 @@ class SimpleTestDiscovery:
 
         import glob, importlib, os, pathlib, sys
 
-        if not self.root_directory:
-            MODULE_DIR = folder
-        else:
-            MODULE_DIR = self.root_directory
-
+        MODULE_DIR = self.root_directory or folder
         logger.debug(sys.path)
         logger.debug(f'MODULE_DIR {MODULE_DIR}')
-        if not MODULE_DIR in sys.path:
+        if MODULE_DIR not in sys.path:
             sys.path.insert(0, MODULE_DIR)
-            logger.debug(f'after append')
+            logger.debug('after append')
             logger.debug(sys.path)
         # The directory containing your modules needs to be on the search path.
 
@@ -83,9 +79,8 @@ class SimpleTestDiscovery:
 
             for py_file in py_files:
 
-                if search_only_in:
-                    if str(py_file) not in search_only_in:
-                        continue
+                if search_only_in and str(py_file) not in search_only_in:
+                    continue
 
 
                 # print(py_file)
@@ -98,7 +93,7 @@ class SimpleTestDiscovery:
                 if not self.is_module_with_tests(module_name):
                     continue
                 try:
-                    logger.warning('importing ' + module_name)
+                    logger.warning(f'importing {module_name}')
                     module = importlib.import_module(module_name)
                     tests_found = self.find_tests_in_module(module)
                 except Exception as ex:
@@ -118,18 +113,20 @@ class SimpleTestDiscovery:
         return test_set
 
     def compute_module_name_from_path(self, current_file_path):
-        if len(current_file_path.parts) > 1:
-            module_name = str.join('.', current_file_path.parts[:-1]) + '.' + current_file_path.stem
-        else:
-            module_name = current_file_path.stem
-        return module_name
+        return (
+            str.join('.', current_file_path.parts[:-1])
+            + '.'
+            + current_file_path.stem
+            if len(current_file_path.parts) > 1
+            else current_file_path.stem
+        )
 
     def is_excluded_via_configuration(self, current_file_path):
         s = str(current_file_path)
-        x = False
-        if s.startswith(self.configuration.discovery_exclusions) or s.endswith(self.configuration.discovery_exclusions):
-            x = True
-        return x
+        return bool(
+            s.startswith(self.configuration.discovery_exclusions)
+            or s.endswith(self.configuration.discovery_exclusions)
+        )
 
     def find_tests_in_module(self, module):
         all_variables = dir(module)
@@ -142,7 +139,7 @@ class SimpleTestDiscovery:
                 attr = getattr(function_or_variable_or_class, "__test__", True)
                 # print(attr)
                 names = self.get_test_case_names_from_class(function_or_variable_or_class)
-                names = map(lambda _: v + '::' + _, names)
+                names = map(lambda _: f'{v}::{_}', names)
                 found_methods.extend(names)
                 continue
 
@@ -158,8 +155,9 @@ class SimpleTestDiscovery:
             return False
 
         may_be_not_loaded = sys.modules.get("unittest")
-        is_unit_test_sub = may_be_not_loaded and issubclass(function_or_variable_or_class, may_be_not_loaded.TestCase)
-        return is_unit_test_sub
+        return may_be_not_loaded and issubclass(
+            function_or_variable_or_class, may_be_not_loaded.TestCase
+        )
 
     def is_module_with_tests(self, module_name):
         module_short_name = module_name.split('.')[-1]

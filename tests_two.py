@@ -13,16 +13,15 @@ def test_dummy():
     print('te st_method 2')
 
 def test_x():
-    x = 2
     print('test_x before assert')
     print(f'PID in test: {os.getpid()}')
 
-    assert x == 2
+    assert True
     print('test_method 3')
 
 def test_z():
     print('test_method y')
 
 def test_failing():
-    assert 3 == 3
+    assert True
     assert 3 == 2

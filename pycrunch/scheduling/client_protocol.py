@@ -59,7 +59,7 @@ class EchoClientProtocol(asyncio.Protocol):
             # print(environ)
 
             r = TestRunner(runner_engine, timeline)
-            timeline.mark_event(f'Run: about to run tests')
+            timeline.mark_event('Run: about to run tests')
             try:
                 timeline.mark_event(f'Run: total tests planned: {len(msg.task.tests)}')
                 results = r.run(msg.task.tests)

@@ -45,12 +45,8 @@ class PyTestInterceptionPlugin:
 
     def pytest_runtest_logreport(self, report):
         # pprint(vars(report))
-        if report.when == 'setup':
-            if report.outcome == 'skipped':
-                self.passed_tests.add(report.nodeid)
-
-        if report.when == 'teardown':
-            pass
+        if report.when == 'setup' and report.outcome == 'skipped':
+            self.passed_tests.add(report.nodeid)
 
         if report.when == 'call':
             if report.outcome == 'skipped':
@@ -62,10 +58,4 @@ class PyTestInterceptionPlugin:
                 self.failed_tests.add(report.nodeid)
 
     def guess_run_status(self, test_name):
-        if len(self.failed_tests) > 0:
-            return False
-
-        if len(self.passed_tests) <= 0:
-            return False
-        else:
-            return True
+        return False if len(self.failed_tests) > 0 else len(self.passed_tests) > 0

@@ -45,7 +45,7 @@ class Configuration:
         self.multiprocessing_threshold = 5
         # self.runtime_engine = 'pytest'
         self.available_engines = ['simple', 'pytest', 'django']
-        self.environment_vars = dict()
+        self.environment_vars = {}
         self.path_mapping = NoPathMapping()
 
     def runtime_engine_will_change(self, new_engine):
@@ -72,41 +72,34 @@ class Configuration:
         self.engine_directory = engine_directory
 
     def load_runtime_configuration(self):
-        print(str(self.configuration_file_path().absolute()))
+        print(self.configuration_file_path().absolute())
         print(self.configuration_file_path())
         try:
             with io.open(self.configuration_file_path(), encoding='utf-8') as f:
                 x = yaml.safe_load(f)
-                discovery = x.get('discovery', None)
-                if discovery:
+                if discovery := x.get('discovery', None):
                     exc = discovery.get('exclusions', None)
                     if not hasattr(exc, "__len__"):
                         raise Exception('.pycrunch-config.yaml: discovery->exclusions should be array')
                     self.discovery_exclusions = tuple(exc)
-                engine_config = x.get('engine', None)
-                if engine_config:
-                    runtime_engine_name = engine_config.get('runtime', None)
-                    if runtime_engine_name:
+                if engine_config := x.get('engine', None):
+                    if runtime_engine_name := engine_config.get('runtime', None):
                         self.runtime_engine_will_change(runtime_engine_name)
-                    runtime_mode = engine_config.get('mode', None)
-                    if runtime_mode:
+                    if runtime_mode := engine_config.get('mode', None):
                         self.runtime_mode_will_change(runtime_mode)
-                    cpu_cores = engine_config.get('cpu-cores', None)
-                    if cpu_cores:
+                    if cpu_cores := engine_config.get('cpu-cores', None):
                         self.cpu_cores_will_change(cpu_cores)
-                    multiprocess_threshold = engine_config.get('multiprocessing-threshold', None)
-                    if multiprocess_threshold:
+                    if multiprocess_threshold := engine_config.get(
+                        'multiprocessing-threshold', None
+                    ):
                         self.multiprocess_threshold_will_change(multiprocess_threshold)
 
 
-                pinned_tests = x.get('pinned-tests', None)
-                if pinned_tests:
+                if pinned_tests := x.get('pinned-tests', None):
                     self.apply_pinned_tests(pinned_tests)
-                additional_env = x.get('env', None)
-                if additional_env:
+                if additional_env := x.get('env', None):
                     self.apply_additional_env(additional_env)
-                path_mapping = x.get('path-mapping', None)
-                if path_mapping:
+                if path_mapping := x.get('path-mapping', None):
                     self.apply_path_mapping(path_mapping)
                 print(x)
                 print(f)
@@ -136,15 +129,12 @@ class Configuration:
         existing_config['pinned-tests'] = list(fqns)
         with io.open(self.configuration_file_path(), encoding='utf-8', mode='w') as f:
             yaml.dump(existing_config, f, default_flow_style=False)
-        pass
 
     def is_test_pinned(self, fqn):
         return fqn in self.pinned_tests
 
     def apply_pinned_tests(self, pinned_tests):
-        self.pinned_tests = set()
-        for fqn in pinned_tests:
-            self.pinned_tests.add(fqn)
+        self.pinned_tests = set(pinned_tests)
 
     def apply_additional_env(self, additional_env):
         print(additional_env)
@@ -159,7 +149,6 @@ class Configuration:
 
     def cpu_cores_will_change(self, cpu_cores):
         self.cpu_cores = cpu_cores
-        pass
 
     def get_default_cpu_cores(self):
         cores = multiprocessing.cpu_count()

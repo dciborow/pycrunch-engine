@@ -88,12 +88,7 @@ class TestRunnerServerProtocol(asyncio.Protocol):
         self.completion_future.set_result(self.results)
 
     def find_task_with_id(self, msg):
-        found_task = None
-        for x in self.tasks:
-            if x.id == msg.task_id:
-                found_task = x
-                break
-        return found_task
+        return next((x for x in self.tasks if x.id == msg.task_id), None)
 
     def results_did_become_available(self, results):
         self.results = results

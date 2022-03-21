@@ -77,8 +77,6 @@ class ServerProtocolTests(TestCase):
         message_queue = list(sut.message_queue.queue)
         assert len(message_queue) == 1
 
-        pass
-
     def test_message_split_into_three_packets_with_overrun_message(self):
         sut = self.create_sut()
         transport = Mock()
@@ -116,8 +114,6 @@ class ServerProtocolTests(TestCase):
         assert len(message_queue) == 2
         assert message_queue[0].task_id == '43'
         assert message_queue[1].task_id == '44'
-
-        pass
 
     def test_message_header_split_into_packets(self):
         # -> {length}{buffer}{length}{buffer}
@@ -160,8 +156,6 @@ class ServerProtocolTests(TestCase):
         assert message_queue[0].task_id == '43'
         assert message_queue[1].task_id == '44'
 
-        pass
-
     def create_sut(self):
         sut = TestRunnerServerProtocol(self.plan, Mock(), Mock())
         sut.process_messages = Mock()
@@ -201,8 +195,6 @@ class ServerProtocolTests(TestCase):
         assert message_queue[0].task_id == '43'
         assert message_queue[1].task_id == '44'
         assert message_queue[5].task_id == '49'
-
-        pass
 
     def transport_message_bytes(self, msg):
         msg_bytes= pickle.dumps(msg)

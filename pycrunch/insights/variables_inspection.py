@@ -43,16 +43,12 @@ class InsightTimeline:
         self.variables = []
         self.start_timestamp = None
         self.clock = clock
-        pass
 
     def start(self):
         self.start_timestamp = self.clock.now()
 
     def as_json(self):
-        results = []
-        for v in self.variables:
-            results.append(v.as_json())
-        return results
+        return [v.as_json() for v in self.variables]
 
     def record(self, **kwargs):
         # print(kwargs)

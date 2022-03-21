@@ -24,7 +24,7 @@ class TestRunner():
         from pycrunch.shared.models import TestMetadata
         self.timeline.mark_event('Run: inside run method - imports complete')
 
-        results = dict()
+        results = {}
         for test_to_run in tests:
             self.timeline.begin_nested_interval(f'Running test {test_to_run.get("fqn", "unknown")}')
 
@@ -61,8 +61,7 @@ class TestRunner():
                     self.timeline.mark_event('After coverage serialization')
             except Exception as e:
                 self.timeline.mark_event('Test execution exception.')
-                pass
-                # logger.exception('error during run', exc_info=e)
+                        # logger.exception('error during run', exc_info=e)
             results[fqn] = coverage_for_run
             self.timeline.end_nested_interval()
         return results

@@ -31,9 +31,16 @@ class RunTestTask(AbstractTask):
         self.timeline.mark_event('run')
 
         await engine.tests_will_run(self.tests)
-        converted_tests = list()
-        for test in self.tests:
-            converted_tests.append(dict(fqn=test.discovered_test.fqn, filename=test.discovered_test.filename,name=test.discovered_test.name, module=test.discovered_test.module, state='converted'))
+        converted_tests = [
+            dict(
+                fqn=test.discovered_test.fqn,
+                filename=test.discovered_test.filename,
+                name=test.discovered_test.name,
+                module=test.discovered_test.module,
+                state='converted',
+            )
+            for test in self.tests
+        ]
 
         runner = MultiprocessTestRunner(timeout=30, timeline=self.timeline)
         self.timeline.mark_event('before running tests')
@@ -49,7 +56,7 @@ class RunTestTask(AbstractTask):
 
         self.timeline.mark_event('before tests_did_run')
         if not self.results:
-            self.results = dict()
+            self.results = {}
 
         await engine.tests_did_run(self.results)
 
@@ -58,10 +65,7 @@ class RunTestTask(AbstractTask):
         self.timeline.mark_event('Postprocessing: completed')
 
 
-        results_as_json = dict()
-        for k,v in self.results.items():
-            results_as_json[k] = v.as_json()
-
+        results_as_json = {k: v.as_json() for k,v in self.results.items()}
         self.timeline.mark_event('Sending: test_run_completed event')
 
         await shared.pipe.push(event_type='test_run_completed',
@@ -86,8 +90,6 @@ class RunTestTask(AbstractTask):
 
         self.timeline.stop()
         execution_history.save(self.timeline)
-
-        pass;
 
 
 # https://stackoverflow.com/questions/45369128/python-multithreading-queue

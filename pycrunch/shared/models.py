@@ -23,7 +23,7 @@ class TestState:
 class AllTests:
     def __init__(self):
         # fqn -> TestState
-        self.tests = dict()
+        self.tests = {}
 
     def test_discovered(self, fqn, discovered_test, is_pinned):
         # todo preserve state
@@ -53,7 +53,7 @@ class AllTests:
 
 
     def collect_by_fqn(self, fqns):
-        result = list()
+        result = []
         for fqn in fqns:
             logger.info(f'collecting {fqn} for run')
 
@@ -64,18 +64,16 @@ class AllTests:
         return result
 
     def log_test_details(self, current_test):
-        logger.debug(f'---')
+        logger.debug('---')
         logger.debug(f'current_test filename is {current_test.discovered_test.filename}')
         logger.debug(f'current_test fqn is {current_test.discovered_test.fqn}')
         logger.debug(f'current_test module is {current_test.discovered_test.module}')
-        logger.debug(f'---')
+        logger.debug('---')
 
     def get_pinned_tests(self):
-        result = set()
-        for test in self.tests.values():
-            if test.pinned:
-                result.add(test.discovered_test.fqn)
-        return result
+        return {
+            test.discovered_test.fqn for test in self.tests.values() if test.pinned
+        }
 
     def discard_tests_not_in_map(self):
         for fqn in list(self.tests):

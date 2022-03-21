@@ -14,7 +14,7 @@ def test_1():
     # b = a * 12
     print(f'b {b}')
     print('test_method__op 5')
-    assert 0 == 0
+    assert True
 
 def test_6():
     import playground

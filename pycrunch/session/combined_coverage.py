@@ -43,20 +43,13 @@ class CombinedCoverage:
     """
     def __init__(self):
         # filename -> FileStatistics
-        self.files = dict()
+        self.files = {}
 
         # all files involved in execution of test.
         # FQN will end up showing in multiple files if dependent file was used during run
         # filename.py -> set(fqn, fqn)
         self.dependencies = defaultdict(set)
         self.file_dependencies_by_tests = defaultdict(set)
-        #  in format
-        #   {
-        #       module:test_name : { status:failed },
-        #       module_1:test_name_1 : { status:success },
-        #    }
-        # self.aggregated_results = defaultdict(dict)
-        pass
 
     def mark_dependency(self, filename, fqn):
         if fqn not in self.dependencies[filename]:
@@ -84,7 +77,7 @@ class CombinedCoverage:
         statistics.mark_lines(lines_covered=lines_covered, fqn=fqn, )
 
     def ensure_file_statistics_exist(self, filename):
-        if not filename in self.files:
+        if filename not in self.files:
             statistics = FileStatistics(filename=filename)
             self.files[filename] = statistics
 
@@ -109,10 +102,7 @@ class CombinedCoverage:
     def clean_coverage_in_stale_files(self, fqn, test_run):
         # if file was not hit at all, we need to clear combined coverage there from previous runs
         previous_files = set(self.file_dependencies_by_tests[fqn])
-        files = set()
-        for single_file_run in test_run.files:
-            files.add(single_file_run.filename)
-
+        files = {single_file_run.filename for single_file_run in test_run.files}
         diff = previous_files - files
         for stale_file in diff:
             self.ensure_file_statistics_exist(stale_file)
@@ -131,8 +121,10 @@ def serialize_combined_coverage(combined: CombinedCoverage):
 
 
 def compute_lines(x):
-    zzz = {line_number:list(entry_points) for (line_number, entry_points) in x.lines_with_entrypoints.items()}
-    return zzz
+    return {
+        line_number: list(entry_points)
+        for (line_number, entry_points) in x.lines_with_entrypoints.items()
+    }
 
     # return result
 

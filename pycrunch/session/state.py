@@ -21,7 +21,6 @@ class EngineState:
         self.folder = folder_auto
         self.all_tests = all_tests
         self.runtime_configuration_ready = False
-        pass
 
 
 
@@ -32,9 +31,6 @@ class EngineState:
         discovery_engine = SimpleTestDiscovery()
         test_set = discovery_engine.find_tests_in_folder(self.folder)
         await engine.test_discovery_will_become_available(test_set)
-
-
-        pass
 
     async def will_start_diagnostics_collection(self):
         self.prepare_runtime_configuration_if_necessary()

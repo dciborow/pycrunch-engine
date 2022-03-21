@@ -45,12 +45,12 @@ class FSWatcher(Watcher):
                 if force or self.should_watch(file):
                     if change_type == Change.deleted:
                         execution_pipeline.add_task(FileRemovedTask(file=file))
-                        logger.info('Added file removal for pipeline ' + file)
+                        logger.info(f'Added file removal for pipeline {file}')
                     else:
                         execution_pipeline.add_task(FileModifiedNotificationTask(file=file))
                         logger.info('Added file modification for pipeline ' + file)
                 else:
-                    logger.debug('non-significant file changed ' + file)
+                    logger.debug(f'non-significant file changed {file}')
 
         logger.debug('END thread_proc')
 

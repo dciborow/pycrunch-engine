@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 @shared.sio.on('message')
 def handle_message(message):
-    logger.debug('received message 2: ' + message)
+    logger.debug(f'received message 2: {message}')
 
 
 
@@ -33,11 +33,11 @@ def handle_json(json):
     # url_for1 = url_for('my event', _external=True)
     # logger.debug('url + ' + url_for1)
     pipe.push(event_type='connected', **{'data': 'Connected'})
-    logger.debug('received json 2: ' + str(json))
+    logger.debug(f'received json 2: {str(json)}')
 
 @shared.sio.on('my event')
 async def handle_my_custom_event(sid, json):
-    logger.debug('received json (my event 2): ' + str(json))
+    logger.debug(f'received json (my event 2): {str(json)}')
     if 'action' not in json:
         logger.debug('no action specified')
 
@@ -50,16 +50,13 @@ async def handle_my_custom_event(sid, json):
             return
         logger.info('Running tests...')
         tests = json.get('tests')
-        fqns = set()
-        for test in tests:
-            fqns.add(test['fqn'])
-
+        fqns = {test['fqn'] for test in tests}
         tests_to_run = all_tests.collect_by_fqn(fqns)
 
         execution_pipeline.add_task(RunTestTask(tests_to_run))
     if action == 'load-file':
         filename = json.get('filename')
-        logger.debug('download_file ' + filename)
+        logger.debug(f'download_file {filename}')
         #         return asynchronously
         execution_pipeline.add_task(DownloadFileTask(filename))
     if action == 'diagnostics':

@@ -12,12 +12,11 @@ from pycrunch.session.configuration import Configuration
 def test_simple_discovery():
     actual = run_dogfood_discovery()
 
-    found_flag = False
-    for t in actual.tests:
-        if t.filename.endswith('test_discovery_specs_demo.py'):
-            if t.name == 'test_regular':
-                found_flag = True
-                break
+    found_flag = any(
+        t.filename.endswith('test_discovery_specs_demo.py')
+        and t.name == 'test_regular'
+        for t in actual.tests
+    )
 
     assert found_flag
 
@@ -59,7 +58,6 @@ def run_dogfood_discovery():
     root_folder = Path('.')
     current_folder = root_folder.joinpath('pycrunch', 'tests', 'dogfood').absolute()
     sut = SimpleTestDiscovery(str(root_folder.absolute()), Configuration())
-    actual = sut.find_tests_in_folder(str(current_folder.absolute()))
-    return actual
+    return sut.find_tests_in_folder(str(current_folder.absolute()))
 
 

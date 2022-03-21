@@ -37,9 +37,7 @@ def run():
     parser.add_argument("--port", type=int,
                         help="Port number to listen")
     args = parser.parse_args()
-    port = 5000
-    if args.port:
-        port = args.port
+    port = args.port or 5000
     print(f'PyCrunch port will be {port}')
     print(f'PyCrunch Web-UI at http://0.0.0.0:{port}/ui/')
     print(f'                or http://127.0.0.1:{port}/ui/')

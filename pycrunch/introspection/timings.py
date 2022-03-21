@@ -31,7 +31,7 @@ class Interval:
         self.events.append(Marker(name, relative_to))
 
     def to_console(self, indent=0):
-        join = " ".join([" " for x in range(1, indent + 1)])
+        join = " ".join([" " for _ in range(1, indent + 1)])
         print(f'{join}  {self.name} [{self.started_at} ... {self.stopped_at}] ({self.duration():.3f} seconds)')
         for evt in self.events:
             print(f'    {join}  [event] [{evt.relative_timestamp()}] {evt.name} at {evt.timestamp} (in {self.name}) ')
@@ -87,5 +87,4 @@ class Timeline:
 
     def mark_event(self, event_name):
         self.current_interval().mark_event(event_name, self.relative_to)
-        pass
 

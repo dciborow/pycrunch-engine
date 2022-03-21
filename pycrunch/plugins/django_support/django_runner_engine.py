@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 class DjangoRunnerEngine(_abstract_runner.Runner):
     def __init__(self):
         config.prepare_django()
-        pass
 
     def run_test(self, test) -> ExecutionResult:
         # import django
@@ -28,7 +27,7 @@ class DjangoRunnerEngine(_abstract_runner.Runner):
 
         execution_result = ExecutionResult()
         try:
-            fqn_test_to_run = test.filename + '::' + test.name
+            fqn_test_to_run = f'{test.filename}::{test.name}'
             pprint(fqn_test_to_run)
             plugin = PyTestInterceptionPlugin(tests_to_run=[fqn_test_to_run])
 
@@ -46,7 +45,7 @@ class DjangoRunnerEngine(_abstract_runner.Runner):
             else:
                 execution_result.run_did_fail()
 
-            # logger.debug('after exec_module')
+                # logger.debug('after exec_module')
         except Exception as e:
             etype, value, current_traceback = sys.exc_info()
             execution_result.record_exception(etype=etype, value=value, current_traceback=current_traceback)

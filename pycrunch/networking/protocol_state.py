@@ -43,20 +43,18 @@ class ProtocolState():
                 self.header_buffer.write(message_header_bytes)
                 self.header_bytes_so_far += read_header_amount
                 self.current_payload_read_so_far += read_header_amount
-                # print(f'current_payload_read_so_far {self.current_payload_read_so_far}')
-                if self.header_bytes_so_far >= self.header_size:
-                    getbuffer = self.header_buffer.getbuffer()
-                    # print(f'self.header_buffer.len() {len(getbuffer)}')
-                    self.message_bytes_total = struct.unpack('i', getbuffer.tobytes())[0]
-                    # print(f'!!! Expecting message_bytes_total: {self.message_bytes_total}')
-                    self.header_buffer = None
-                    self.header_bytes_so_far = 0
-                    self.in_header = False
-                    self.in_message = True
-                else:
+                if self.header_bytes_so_far < self.header_size:
                     # wait for other part of the header
                     break
 
+                getbuffer = self.header_buffer.getbuffer()
+                # print(f'self.header_buffer.len() {len(getbuffer)}')
+                self.message_bytes_total = struct.unpack('i', getbuffer.tobytes())[0]
+                # print(f'!!! Expecting message_bytes_total: {self.message_bytes_total}')
+                self.header_buffer = None
+                self.header_bytes_so_far = 0
+                self.in_header = False
+                self.in_message = True
             read_amount = self.message_bytes_total - self.message_bytes_so_far
             if self.message_bytes_total - self.message_bytes_so_far > self.current_payload_size - self.current_payload_read_so_far:
                 read_amount = self.current_payload_size - self.current_payload_read_so_far
@@ -77,7 +75,4 @@ class ProtocolState():
                 self.in_message = False
 
                 self.message_queue.put_nowait(message)
-
-            if self.current_payload_read_so_far >= self.current_payload_size:
-                pass
         # print('read to the end')

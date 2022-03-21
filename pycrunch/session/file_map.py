@@ -10,10 +10,7 @@ class TestMap:
         if len(test_names) <= 0:
             return
 
-        new_list = set()
-        for test in test_names:
-            new_list.add(module_name + ':' + test)
-
+        new_list = {f'{module_name}:{test}' for test in test_names}
         self.map[filename] = new_list
 
     def get_immutable_tests_for_file(self, filename):
@@ -23,10 +20,7 @@ class TestMap:
         self.map.pop(filename)
 
     def test_exist(self, filename, fqn):
-        if fqn in self.map[filename]:
-            return True
-
-        return False
+        return fqn in self.map[filename]
 
 
 test_map = TestMap()

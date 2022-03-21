@@ -91,7 +91,7 @@ def test_environment_vars():
         sut.load_runtime_configuration()
         assert 'insuredportal.settings' == sut.environment_vars.get('DJANGO_SETTINGS')
         assert 'test' == sut.environment_vars.get('ENV2')
-        assert sut.environment_vars.get('NOT') == None
+        assert sut.environment_vars.get('NOT') is None
 
 
 

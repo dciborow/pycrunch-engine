@@ -38,31 +38,33 @@ class MultiprocessTestRunner:
         self.timeline.mark_event('Subprocess: starting...')
 
         logger.debug('Initializing subprocess...')
-        child_processes = []
-        for task in self.tasks:
-            child_processes.append(asyncio.create_subprocess_shell(self.get_command_line_for_child(port,task.id), cwd=config.working_directory, shell=True))
+        child_processes = [
+            asyncio.create_subprocess_shell(
+                self.get_command_line_for_child(port, task.id),
+                cwd=config.working_directory,
+                shell=True,
+            )
+            for task in self.tasks
+        ]
 
         logger.debug(f'Waiting for startup of {len(self.tasks)} subprocess task(s)')
         # wait to start all
         subprocesses_results = await asyncio.gather(*child_processes)
         logger.debug('Startup complete')
 
-        child_waiters = []
-        for coro in subprocesses_results:
-            child_waiters.append(coro.wait())
-
+        child_waiters = [coro.wait() for coro in subprocesses_results]
         logger.debug('Begin waiting for subprocess completion...')
         # await asyncio.wait_for(asyncio.gather(*child_waiters), 5)
         await asyncio.gather(*child_waiters)
         logger.debug('All subprocesses are completed')
 
-        logger.debug(f'Waiting for completion from TCP server')
+        logger.debug('Waiting for completion from TCP server')
         demo_results = await asyncio.gather(*self.completion_futures)
-        logger.debug(f'TCP ran to the end')
+        logger.debug('TCP ran to the end')
         self.results = self.merge_task_results(demo_results)
         server.close()
 
-        logger.debug(f'TCP server and child processes ran to the end')
+        logger.debug('TCP server and child processes ran to the end')
 
     def get_command_line_for_child(self, port, task_id):
         engine_root = f' {config.engine_directory}{os.sep}pycrunch{os.sep}multiprocess_child_main.py '
@@ -81,7 +83,7 @@ class MultiprocessTestRunner:
 
     def merge_task_results(self, demo_results):
         self.timeline.mark_event('merging task results')
-        new_dict = dict()
+        new_dict = {}
         # here are multiple dictionaries coming from each subprocess:
         for results_by_fqn in demo_results:
             new_dict.update(results_by_fqn)

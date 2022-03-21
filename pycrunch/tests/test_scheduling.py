@@ -11,11 +11,7 @@ def generate_test_fake(name):
 
 
 def generate_tests(desired_amount):
-    result = []
-    for n in range(0, desired_amount):
-        result.append(generate_test_fake(n))
-
-    return result
+    return [generate_test_fake(n) for n in range(desired_amount)]
 
 
 def test_scheduled_single_test():
